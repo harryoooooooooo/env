@@ -24,6 +24,9 @@ Check debug log with `:b *debug*` to see if there is any missing command.
 Most of my self-defined commands are bound to keys in user mode,
 press `,` key in normal mode to see the available commands.
 
+A special `osc52` script is used in `:clip` command.
+Sample script can be found [here](https://chromium.googlesource.com/apps/libapps/+/master/hterm/etc/osc52.sh).
+
 A special option is `term_run_template`. Currently it's used by `:find` and `:sudo-write`.
 I only set up the option for wayland, x11, and tmux windowing modules.
 Please reference the docstring and set it up if you're using other windowing modules.

@@ -145,15 +145,22 @@ Note that for each window this command always starts from being as nowrap.' \
 }}
 map global user w ':toggle-wrap<ret>' -docstring 'toggle wrap and unwrap line.'
 
+evaluate-commands %{ try %{
+evaluate-commands %sh{
+    if ! command -v osc52 >/dev/null 2>&1; then
+        echo 'echo -debug Missing osc52 script, :clip command will not be defined.'
+        echo 'echo -debug Sample script can be found at: https://chromium.googlesource.com/apps/libapps/+/master/hterm/etc/osc52.sh'
+        echo 'fail Missing osc52 script'
+    fi
+}
 define-command -docstring '
 clip: Copy the selected text to clipboard by using OSC 52 escape sequence.
-Additional support/configuring of terminal (or tmux/screen if they are used)
-is probably needed.' \
+Additional support/configuring of terminal may be needed.' \
     -params 0 clip %{ nop %sh{
-    encoded=$(printf '%s' "${kak_selection}" | base64 | tr -d '\n')
-    printf "\e]52;c;%s\a" "$encoded" >/dev/tty
+    printf '%s' "${kak_selection}" | osc52 >/dev/tty
 }}
 map global user c ':clip<ret>' -docstring 'copy selection to clipboard.'
+}}
 
 declare-option -hidden -docstring %{
     This option should define a template script for commands to run a
