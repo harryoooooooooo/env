@@ -23,7 +23,7 @@ set-option global ui_options terminal_enable_mouse=false
 add-highlighter global/nu number-lines -hlcursor -relative
 
 ## Ag (the silver searcher) is mush faster then grep.
-evaluate-commands %{ try %{
+try %{
 evaluate-commands %sh{
     if ! command -v ag >/dev/null 2>&1; then
         echo 'echo -debug Missing ag command, it is more recommended than grep'
@@ -31,11 +31,11 @@ evaluate-commands %sh{
     fi
 }
 set-option global grepcmd 'ag --noheading --column --nobreak'
-}}
+}
 map global user g ':grep ' -docstring 'grep text under cwd'
 
 ## Add the same <c-a>/<c-x> functions as vim.
-evaluate-commands %{ try %{
+try %{
 evaluate-commands %sh{
     if ! command -v bc >/dev/null 2>&1; then
         echo 'echo -debug Missing bc command, <c-a> and <c-x> will not be set'
@@ -54,7 +54,7 @@ define-command -hidden -params 2 inc %{
 }
 map global normal <c-a> ':inc %val{count} +<ret>'
 map global normal <c-x> ':inc %val{count} -<ret>'
-}}
+}
 
 ## Handy for selecting multi parapraph ('}p}p}p' vs '}P}P}P').
 map global object P p -docstring 'paragraph'
@@ -145,7 +145,7 @@ Note that for each window this command always starts from being as nowrap.' \
 }}
 map global user w ':toggle-wrap<ret>' -docstring 'toggle wrap and unwrap line.'
 
-evaluate-commands %{ try %{
+try %{
 evaluate-commands %sh{
     if ! command -v osc52 >/dev/null 2>&1; then
         echo 'echo -debug Missing osc52 script, :clip command will not be defined.'
@@ -160,7 +160,7 @@ Additional support/configuring of terminal may be needed.' \
     printf '%s' "${kak_selection}" | osc52 >/dev/tty
 }}
 map global user c ':clip<ret>' -docstring 'copy selection to clipboard.'
-}}
+}
 
 declare-option -hidden -docstring %{
     This option should define a template script for commands to run a
@@ -177,7 +177,7 @@ declare-option -hidden -docstring %{
     the given command "fzf".
 } str term_run_template
 
-evaluate-commands %{ try %{
+try %{
 evaluate-commands %sh{
     if ! command -v ag >/dev/null 2>&1; then
         echo 'echo -debug Missing ag command, :find command will not be defined.'
@@ -198,9 +198,9 @@ find: Invoke fzf to find and open a file' \
     fi
 }}
 map global user f ':find<ret>' -docstring 'find file under cwd with fzf'
-}}
+}
 
-evaluate-commands %{ try %{
+try %{
 evaluate-commands %sh{
     if ! command -v sudo >/dev/null 2>&1; then
         echo 'echo -debug Missing sudo command, :sudo-write command will not be defined.'
@@ -225,11 +225,11 @@ define-command -hidden -params 1 sudo-write-impl %{ evaluate-commands %sh{
     printf '%s' "${kak_selection}" | sh -c "${script}" >/dev/null
 }}
 alias global sw sudo-write
-}}
+}
 
 hook global ModuleLoaded wayland|x11 %{
 
-evaluate-commands %{ try %{
+try %{
 evaluate-commands %sh{
     if ! command -v urxvt >/dev/null 2>&1; then
         echo 'echo -debug Missing urxvt command, term_run_template will not be set'
@@ -239,7 +239,7 @@ evaluate-commands %sh{
 set-option global term_run_template %{
     urxvt -title float-urxvt -e bash -c "%s </proc/$$/fd/0 >/proc/$$/fd/1" </dev/null 2>&1 | true
 }
-}}
+}
 
 } # End of ModuleLoaded wayland|x11
 
