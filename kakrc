@@ -62,6 +62,19 @@ map global object P p -docstring 'paragraph'
 ## Faster view mode.
 map global normal <c-v> 4V
 
+## Arrow keys alias in view mode.
+map global view <left>  h -docstring 'scroll left'
+map global view <down>  j -docstring 'scroll down'
+map global view <up>    k -docstring 'scroll up'
+map global view <right> l -docstring 'scroll right'
+
+## Handy for extending selection with goto mode.
+map global goto H h -docstring 'line begin'
+map global goto J j -docstring 'line end'
+map global goto K k -docstring 'buffer top'
+map global goto L l -docstring 'buffer bottom'
+map global goto E e -docstring 'buffer end'
+
 ## Indent settings. Default 2 spaces.
 set-option global indentwidth 2
 # Use a tab in golang.
