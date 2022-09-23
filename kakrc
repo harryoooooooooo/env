@@ -156,8 +156,12 @@ evaluate-commands %sh{
 define-command -docstring '
 clip: Copy the selected text to clipboard by using OSC 52 escape sequence.
 Additional support/configuring of terminal may be needed.' \
-    -params 0 clip %{ nop %sh{
-    printf '%s' "${kak_selection}" | osc52 >/dev/tty
+    -params 0 clip %{ evaluate-commands %sh{
+    if printf '%s' "${kak_selection}" | osc52 >/proc/$kak_client_pid/fd/1; then
+        echo 'echo -markup {Information}Selection copied.'
+    else
+        echo 'fail Failed to copy the selection'
+    fi
 }}
 map global user c ':clip<ret>' -docstring 'copy selection to clipboard.'
 }
