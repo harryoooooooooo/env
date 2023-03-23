@@ -49,7 +49,7 @@ define-command -hidden -params 2 inc %{
         else
             count="$1"
         fi
-        printf '%s%s\n' 'execute-keys <a-i>na' "$2($count)<esc>|bc<ret>"
+        printf '%s%s%s\n' 'execute-keys <a-i>na' "$2($count)" '<ret><esc>|bc|tr<space>-d<space>\\n<ret>'
     }
 }
 map global normal <c-a> ':inc %val{count} +<ret>'
@@ -70,14 +70,19 @@ map global view <right> l -docstring 'scroll right'
 
 ## Indent settings. Default 2 spaces.
 set-option global indentwidth 2
-# Use a tab in golang.
-hook global BufSetOption filetype=go %{
+# Languages that prefer tabs.
+hook global BufSetOption filetype=(go|ini) %{
     set-option buffer indentwidth 0
     set-option buffer tabstop 2
 }
-# Keep using 4 spaces in rust and kak.
+# Languages that prefer 4 spaces.
 hook global BufSetOption filetype=(rust|kak) %{
     set-option buffer indentwidth 4
+}
+# Many C projects mix tab and space while assuming width=8.
+hook global BufSetOption filetype=c %{
+    set-option buffer indentwidth 0
+    set-option buffer tabstop 8
 }
 
 ## Smart Indent.
@@ -103,10 +108,12 @@ plug "robertmeta/plug.kak" noload
 plug "kak-lsp/kak-lsp" do %{
     cargo install --locked --force --path .
 } config %{
-    ## Enable Language Server Protocol for golang.
-    hook global WinSetOption filetype=go %{
+    ## Enable Language Server Protocol.
+    hook global WinSetOption filetype=(go|python|rust) %{
         lsp-enable-window
         map window user d ':lsp-hover<ret>' -docstring 'run lsp-hover.'
+        map window user D ':lsp-hover-buffer<ret>' -docstring 'run lsp-hover-buffer.'
+        map window user = ':lsp-formatting-sync<ret>' -docstring 'run lsp-formatting-sync.'
     }
 }
 
@@ -122,8 +129,8 @@ plug "harryoooooooooo/exchange.kak" config %{
 
 plug "harryoooooooooo/diff.kak" config %{
     diff-enable-auto-detect
-    map global user n ':diff-jump-hunk next<ret>' -docstring 'jump to next diff hunk of the current file'
-    map global user p ':diff-jump-hunk prev<ret>' -docstring 'jump to prev diff hunk of the current file'
+    map global user n ':diff-jump-hunk next<ret>' -docstring 'jump to next diff hunk'
+    map global user p ':diff-jump-hunk prev<ret>' -docstring 'jump to prev diff hunk'
 }
 
 ## Commands.
@@ -170,6 +177,17 @@ Additional support/configuring of terminal may be needed.' \
     fi
 }}
 map global user c ':clip<ret>' -docstring 'copy selection to clipboard.'
+define-command -docstring '
+clip-fn: Copy the filename to clipboard by using OSC 52 escape sequence.
+Additional support/configuring of terminal may be needed.' \
+    -params 0 clip-fn %{ evaluate-commands %sh{
+    if printf '%s' "${kak_bufname}" | osc52 >/proc/$kak_client_pid/fd/1; then
+        echo 'echo -markup {Information}Filename copied.'
+    else
+        echo 'fail Failed to copy the filename'
+    fi
+}}
+map global user C ':clip-fn<ret>' -docstring 'copy filename to clipboard.'
 }
 
 declare-option -hidden -docstring %{
@@ -189,9 +207,9 @@ declare-option -hidden -docstring %{
 
 try %{
 evaluate-commands %sh{
-    if ! command -v ag >/dev/null 2>&1; then
-        echo 'echo -debug Missing ag command, :find command will not be defined.'
-        echo 'fail Missing ag command'
+    if ! command -v ag >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
+        echo 'echo -debug Missing ag or fzf command, :find command will not be defined.'
+        echo 'fail Missing ag or fzf command'
     fi
 }
 define-command -docstring '
@@ -241,13 +259,13 @@ hook global ModuleLoaded wayland|x11 %{
 
 try %{
 evaluate-commands %sh{
-    if ! command -v urxvt >/dev/null 2>&1; then
-        echo 'echo -debug Missing urxvt command, term_run_template will not be set'
-        echo 'fail Missing urxvt command'
+    if ! command -v alacritty >/dev/null 2>&1; then
+        echo 'echo -debug Missing alacritty command, term_run_template will not be set'
+        echo 'fail Missing alacritty command'
     fi
 }
 set-option global term_run_template %{
-    urxvt -title float-urxvt -e bash -c "%s </proc/$$/fd/0 >/proc/$$/fd/1" </dev/null 2>&1 | true
+    alacritty -t float-alacritty -e bash -c "%s </proc/$$/fd/0 >/proc/$$/fd/1" </dev/null 2>&1 | true
 }
 }
 
@@ -258,7 +276,7 @@ hook global ModuleLoaded tmux %{
 set-option global term_run_template %{
     sig=`mktemp --tmpdir kak-tmux-run-XXXXXX-done`
     TMUX="${kak_client_env_TMUX}" tmux \
-        splitw -l 15 "%s </proc/$$/fd/0 >/proc/$$/fd/1; tmux wait-for -S ${sig}" \; \
+        display-popup -E "%s </proc/$$/fd/0 >/proc/$$/fd/1; tmux wait-for -S ${sig}" \; \
         wait-for ${sig} </dev/null >/dev/null 2>&1
     rm ${sig}
 }
@@ -281,5 +299,17 @@ tnew [<commands>]: Similar to :new, but on a new tab.' \
     -params .. -command-completion tnew %{
     tmux-terminal-window kak -c %val{session} -e "%arg{@}"
 }
+
+define-command -docstring '
+smart-split: Split the tmux window vertically when wide enough, otherwise horizontally.' \
+    -params 0 smart-split %{ evaluate-commands %sh{
+    if [ "${kak_window_width}" -ge 180 ]; then
+        echo vnew
+    else
+        echo new
+    fi
+}}
+map global normal <c-s-F9> ':smart-split<ret>'
+map global normal <c-F9> ':tnew<ret>'
 
 } # End of ModuleLoaded tmux
