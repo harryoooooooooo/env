@@ -297,7 +297,7 @@ vnew [<commands>]: Similar to :new, but vertically.' \
 define-command -docstring '
 tnew [<commands>]: Similar to :new, but on a new tab.' \
     -params .. -command-completion tnew %{
-    tmux-terminal-window kak -c %val{session} -e "%arg{@}"
+    tmux-terminal-window -a kak -c %val{session} -e "%arg{@}"
 }
 
 define-command -docstring '
