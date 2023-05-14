@@ -34,3 +34,11 @@ Please reference the docstring and set it up if you're using other windowing mod
 ### Setup
 
 Install [delta](https://github.com/dandavison/delta) to your environment.
+
+## `tmux.conf`
+
+### Usage
+
+* `F7` selects previous window, `F8` selects next window; `Shift+` for pane, `Control+` for session
+* `F9` inserts a new window to the next index
+* `Shift+F9` splits the pane smartly according to the pane width
