@@ -302,14 +302,14 @@ tnew [<commands>]: Similar to :new, but on a new tab.' \
 
 define-command -docstring '
 smart-split: Split the tmux window vertically when wide enough, otherwise horizontally.' \
-    -params 0 smart-split %{ evaluate-commands %sh{
+    -params .. -command-completion smart-split %{ evaluate-commands %sh{
     if [ "${kak_window_width}" -ge 180 ]; then
-        echo vnew
+        echo vnew "$@"
     else
-        echo new
+        echo new "$@"
     fi
 }}
-map global normal <c-s-F9> ':smart-split<ret>'
-map global normal <c-F9> ':tnew<ret>'
+map global normal <c-s-F9> ':smart-split b %val{bufname}<ret>'
+map global normal <c-F9> ':tnew b %val{bufname}<ret>'
 
 } # End of ModuleLoaded tmux
