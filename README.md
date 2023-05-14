@@ -29,6 +29,16 @@ A special option is `term_run_template`. Currently it's used by `:find` and `:su
 I only set up the option for wayland, x11, and tmux windowing modules.
 Please reference the docstring and set it up if you're using other windowing modules.
 
+## `bashrc`
+
+### Setup
+
+* Configure bash completion, fzf completion, and git prompt path according to your distribution.
+* I'm using shell prompt to automatically send the desktop notification when a long running command is done.
+  Configure `NOTIFY_COMMAND_DONE_*` variables to disable/set blocklist/set threshold.
+* Install [hterm-notify](https://chromium.googlesource.com/apps/libapps/+/main/hterm/etc/hterm-notify.sh).
+  This is used as the default notifying tool.
+
 ## `gitconfig`
 
 ### Setup
