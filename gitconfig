@@ -1,0 +1,29 @@
+[alias]
+	br = branch
+	co = checkout
+	st = status
+	lg = log --pretty=oneline
+	pd = diff HEAD~
+	d = diff
+[color]
+	ui = true
+[pull]
+	ff = only
+[core]
+	pager = DELTA_FEATURES=\"${DELTA_FEATURES}`((COLUMNS>=180))&&printf \" side-by-side\"`\" delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	light = false
+	tabs = 8
+	plus-emph-style      = syntax "#004500"
+	plus-style           = syntax "#004500"
+	plus-non-emph-style  = syntax "#002500"
+	minus-emph-style     = syntax "#700000"
+	minus-style          = syntax "#700000"
+	minus-non-emph-style = syntax "#400000"
+[merge]
+	conflictstyle = diff3
+[diff]
+	colorMoved = default
