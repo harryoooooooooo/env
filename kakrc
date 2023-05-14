@@ -162,7 +162,7 @@ try %{
 evaluate-commands %sh{
     if ! command -v osc52 >/dev/null 2>&1; then
         echo 'echo -debug Missing osc52 script, :clip command will not be defined.'
-        echo 'echo -debug Sample script can be found at: https://chromium.googlesource.com/apps/libapps/+/master/hterm/etc/osc52.sh'
+        echo 'echo -debug Sample script can be found at: https://chromium.googlesource.com/apps/libapps/+/main/hterm/etc/osc52.sh'
         echo 'fail Missing osc52 script'
     fi
 }
