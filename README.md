@@ -1,6 +1,8 @@
-# My kakrc
+# My work environment
 
-## Setup
+## `kakrc`
+
+### Setup
 
 First reference [robertmeta/plug.kak](https://github.com/robertmeta/plug.kak) to install the plugin manager.
 For my kakrc to work it should be installed with:
@@ -15,7 +17,7 @@ Then launch Kakoune and run `:plug-install` to install the plugins.
 Quit Kakoune and launch again after the installation is done.
 Check debug log with `:b *debug*` to see if there is any missing command.
 
-## Usage
+### Usage
 
 Most of my self-defined commands are bound to keys in user mode,
 press `,` key in normal mode to see the available commands.
