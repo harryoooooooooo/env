@@ -238,7 +238,7 @@ evaluate-commands %sh{
 define-command -docstring '
 sudo-write [<filename>]: Write as root.' \
     -params 0..1 sudo-write %{
-    execute-keys -draft " %%:sudo-write-impl '%arg{1}'<ret>"
+    execute-keys -draft ",%%:sudo-write-impl '%arg{1}'<ret>"
 }
 define-command -hidden -params 1 sudo-write-impl %{ evaluate-commands %sh{
     if [ -z "${kak_opt_term_run_template}" ]; then
