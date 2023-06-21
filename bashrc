@@ -126,7 +126,7 @@ function _notify_command_done {
   full_comm="${full_comm##*( )}"
   full_comm="${full_comm%%*( )}"
 
-  local comm="${full_comm%% *}"
+  local b comm="${full_comm%% *}"
   [ -z "${comm}" ] && return
   for b in "${NOTIFY_COMMAND_DONE_BLOCK_LIST[@]}"; do
     [[ "${comm}" == "${b}" ]] && return
