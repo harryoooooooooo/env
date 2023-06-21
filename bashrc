@@ -135,8 +135,20 @@ function _notify_command_done {
   local duration=$((_last_command_end_time - _last_command_start_time))
   ((duration < NOTIFY_COMMAND_DONE_THRESHOLD)) && return
 
-  local title="Command done"
-  [[ ${_last_command_status} != 0 ]] && title="${title} status=${_last_command_status}"
+  local pretty_duration
+  if ((duration >= 60*60)); then
+    pretty_duration="${pretty_duration}$((duration/(60*60)))h"
+    duration=$((duration%(60*60)))
+  fi
+  if ((duration >= 60)); then
+    pretty_duration="${pretty_duration}$((duration/60))m"
+    duration=$((duration%60))
+  fi
+  if ((duration > 0)); then
+    pretty_duration="${pretty_duration}${duration}s"
+  fi
+  local title="done in ${pretty_duration}"
+  [[ ${_last_command_status} != 0 ]] && title="${title}, status=${_last_command_status}"
 
   local tty
   if [ -z ${TMUX} ]; then
