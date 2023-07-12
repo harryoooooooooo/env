@@ -304,12 +304,16 @@ define-command -docstring '
 smart-split: Split the tmux window vertically when wide enough, otherwise horizontally.' \
     -params .. -command-completion smart-split %{ evaluate-commands %sh{
     if [ "${kak_window_width}" -ge 180 ]; then
-        echo vnew "$@"
+        comm=vnew
     else
-        echo new "$@"
+        comm=new
     fi
+    for x in "$@"; do
+        comm="${comm} %{${x}}"
+    done
+    printf %s "${comm}"
 }}
-map global normal <c-s-F9> ':smart-split b %val{bufname}<ret>'
-map global normal <c-F9> ':tnew b %val{bufname}<ret>'
+map global normal <c-s-F9> ':smart-split b %val{bufname} \; select %val{selection_desc}<ret>'
+map global normal <c-F9> ':tnew b %val{bufname} \; select %val{selection_desc}<ret>'
 
 } # End of ModuleLoaded tmux
