@@ -77,6 +77,13 @@ alias vimnull='vimdiff +set\ paste /dev/null'
 function t {
   tmux new -As "${1:-main}"
 }
+function _complete_tmux_attach {
+  if [[ "${COMP_CWORD}" -ne 1 ]]; then
+    return
+  fi
+  COMPREPLY=($(compgen -W "$(tmux ls 2>/dev/null | sed 's/:.*//g')" -- "${COMP_WORDS[COMP_CWORD]}"))
+}
+complete -o default -F _complete_tmux_attach t
 
 function kakc {
   if [[ "$#" -eq 1 ]]; then
