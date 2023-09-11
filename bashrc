@@ -39,13 +39,24 @@ function _post_command_hook {
   _last_command_end_time=`date +%s`
   _notify_command_done
 }
+function _ps_gen {
+  # Date and time
+  printf %s "\[\033[38;5;220m\][\d \t]\[\033[0m\]"
+  # Return status
+  if [[ ${_last_command_status} != 0 ]]; then
+    printf "%s" " \[\033[1;38;5;15;48;5;9m\] ${_last_command_status} \[\033[0m\]"
+  fi
+  # Git status
+  GIT_PS1_SHOWDIRTYSTATE=true GIT_PS1_SHOWUNTRACKEDFILES=true GIT_PS1_SHOWCOLORHINTS=true __git_ps1
+  # Working directory
+  printf %s " \[\033[1;38;5;12m\]\w\[\033[0m\]>\n"
+
+  # User name and host name
+  printf %s "\[\033[1;38;5;10m\]\u@\h\[\033[0m\]\$ "
+}
 PROMPT_COMMAND='
 _post_command_hook
-GIT_PS1_SHOWDIRTYSTATE=true GIT_PS1_SHOWUNTRACKEDFILES=true GIT_PS1_SHOWCOLORHINTS=true __git_ps1 \
-"\[\033[38;5;220m\][\d \t]$(
-  [[ ${_last_command_status} != 0 ]] && printf "%s" " \[\033[1;38;5;15;48;5;9m\] ${_last_command_status} "
-)\[\033[0m\]" " \[\033[1;38;5;12m\]\w\[\033[0m\]>
-\[\033[1;38;5;10m\]\u@\h\[\033[0m\]\$ "
+PS1=`_ps_gen`
 trap "trap - DEBUG; _pre_command_hook" DEBUG
 (exit ${_last_command_status})
 '
