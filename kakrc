@@ -33,6 +33,7 @@ evaluate-commands %sh{
 set-option global grepcmd 'ag --noheading --column --nobreak'
 }
 map global user g ':grep ' -docstring 'grep text under cwd'
+map global user G %{<a-i>w*:grep '<c-r>/'<ret>} -docstring 'grep the word under cursor under cwd'
 
 ## Add the same <c-a>/<c-x> functions as vim.
 try %{
@@ -114,6 +115,9 @@ plug "kak-lsp/kak-lsp" do %{
         map window user d ':lsp-hover<ret>' -docstring 'run lsp-hover.'
         map window user D ':lsp-hover-buffer<ret>' -docstring 'run lsp-hover-buffer.'
         map window user = ':lsp-formatting-sync<ret>' -docstring 'run lsp-formatting-sync.'
+
+        # Usage: First <c-o> to close the complete window, then <tab> to jump.
+        map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
     }
 }
 
@@ -254,6 +258,23 @@ define-command -hidden -params 1 sudo-write-impl %{ evaluate-commands %sh{
 }}
 alias global sw sudo-write
 }
+
+define-command -docstring '
+mouse [on|off]: Enable/disable mouse.' \
+    -shell-script-candidates %{ printf 'on\noff\n' } \
+    -params 1 mouse %{ evaluate-commands %sh{
+    case "$1" in
+        on)
+            echo "set-option -add global ui_options terminal_enable_mouse=true"
+            ;;
+        off)
+            echo "set-option -add global ui_options terminal_enable_mouse=false"
+            ;;
+        *)
+            echo "fail Invalid parameter"
+            ;;
+    esac
+}}
 
 hook global ModuleLoaded wayland|x11 %{
 
