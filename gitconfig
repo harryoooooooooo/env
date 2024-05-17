@@ -1,3 +1,5 @@
+[color]
+	ui = true
 [alias]
 	br = branch
 	co = checkout
@@ -5,6 +7,8 @@
 	lg = log --pretty=oneline
 	pd = diff HEAD~
 	d = diff
+	fu = commit --fixup
+	cp = cherry-pick
 [color]
 	ui = true
 [pull]
@@ -27,3 +31,7 @@
 	conflictstyle = diff3
 [diff]
 	colorMoved = default
+[advice]
+	detachedHead = false
+[rebase]
+	autoSquash = true
