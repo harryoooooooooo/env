@@ -49,6 +49,7 @@ Install [delta](https://github.com/dandavison/delta) to your environment.
 
 ### Usage
 
-* `F7` selects previous window, `F8` selects next window; `Shift+` for pane, `Control+` for session
-* `F9` inserts a new window to the next index
-* `Shift+F9` splits the pane smartly according to the pane width
+* `F7` selects previous window, `F8` selects next window, `F9` inserts a new window to the next index
+* `Shift+ F7/F8/F9` for pane; Note that `Shift+F9` splits the pane smartly according to the pane width
+* `Control+ F7/F8` to join/split the current pane to the left/right window.
+  Imagine this as a normal `F7` `F8` but the current pane is carried.
