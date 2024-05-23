@@ -6,7 +6,7 @@ set-face global BufferPadding rgb:4b5263,default
 
 # Set eye-catching and related color to the cursor and the matching char.
 set-face global PrimaryCursor rgb:c792ea,white+bfg
-set-face global MatchingChar  white,rgb:c792ea+bfg
+set-face global MatchingChar  white,blue+dbfg
 add-highlighter global/matching show-matching
 
 # Show newline and tab.
@@ -110,14 +110,15 @@ plug "kak-lsp/kak-lsp" do %{
     cargo install --locked --force --path .
 } config %{
     ## Enable Language Server Protocol.
+    set-face global InlayHint rgb:777788,default+d
+    set-face global Reference white,magenta+dF
+    set-face global ReferenceBind white,magenta+duF
+    set-option global lsp_auto_highlight_references true
     hook global WinSetOption filetype=(go|python|rust) %{
         lsp-enable-window
-        map window user d ':lsp-hover<ret>' -docstring 'run lsp-hover.'
-        map window user D ':lsp-hover-buffer<ret>' -docstring 'run lsp-hover-buffer.'
-        map window user = ':lsp-formatting-sync<ret>' -docstring 'run lsp-formatting-sync.'
-
-        # Usage: First <c-o> to close the complete window, then <tab> to jump.
-        map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
+        map window user l ':enter-user-mode lsp<ret>' -docstring 'Enter lsp mode'
+        map window insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' \
+            -docstring 'Select next snippet placeholder. <c-o> to close the complete window before using this.'
     }
 }
 
