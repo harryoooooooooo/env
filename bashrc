@@ -81,6 +81,8 @@ alias ..2='cd ../..'
 alias ..3='cd ../../..'
 alias ..4='cd ../../../..'
 
+alias history.sync='history -a; history -c; history -r'
+
 alias clip='osc52'
 alias alert='hterm-notify'
 alias vimnull='vimdiff +set\ paste /dev/null'
