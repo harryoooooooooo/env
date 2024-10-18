@@ -303,8 +303,6 @@ set-option global term_run_template %{
     rm ${sig}
 }
 
-alias global terminal tmux-terminal-horizontal
-
 define-command -docstring '
 new [<commands>]: Create a new kakoune client horizontally.
 The optional arguments are passed as commands to the new client' \
