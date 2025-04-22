@@ -81,8 +81,7 @@ alias ..2='cd ../..'
 alias ..3='cd ../../..'
 alias ..4='cd ../../../..'
 
-alias history.sync='history -a; history -c; history -r'
-
+function history.sync { history -a; history -c; history -r; }
 alias clip='osc52'
 alias alert='hterm-notify'
 alias vimnull='vimdiff +set\ paste /dev/null'
@@ -196,11 +195,26 @@ function _complete_set_notify_command_done_mode {
 }
 complete -F _complete_set_notify_command_done_mode set_notify_command_done_mode
 
+function _set_pre_command_hook {
+  trap "trap - DEBUG; _pre_command_hook" DEBUG
+}
+bind -x '"\C-xtrap": _set_pre_command_hook'
+
 # Bind Ctrl/Alt + p/n to search prefix/substring backward/forward history.
 bind '"\C-p":history-search-backward'
 bind '"\C-n":history-search-forward'
 bind '"\ep":history-substring-search-backward'
 bind '"\en":history-substring-search-forward'
+
+# Redefined Ctrl + l clear-screen that:
+# 1. Sync history
+# 2. Clear screen
+# 3. Jump to the end of history
+# 4. Reset _pre_command_hook
+#    * Needed because the hook was already consumed by _clear_screen
+bind -x '"\C-xclear1": history.sync'
+bind '"\C-xclear2": clear-screen'
+bind '"\C-l": "\C-xclear1\C-xclear2\e>\C-xtrap"'
 
 . /usr/share/bash-completion/bash_completion
 . /usr/share/git/git-prompt.sh
