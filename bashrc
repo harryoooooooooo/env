@@ -216,6 +216,18 @@ bind -x '"\C-xclear1": history.sync'
 bind '"\C-xclear2": clear-screen'
 bind '"\C-l": "\C-xclear1\C-xclear2\e>\C-xtrap"'
 
+# Redefined Ctrl + xe edit-and-execute-command that works with pre/post command hook
+function _edit_command {
+  local f=`mktemp --tmpdir edit-command-XXXX.sh`
+  printf '%s\n' "${READLINE_LINE}" > "${f}"
+  "${EDITOR:-vim}" "${f}"
+  READLINE_LINE="$(cat "${f}")"
+  READLINE_POINT="${#READLINE_LINE}"
+  rm "${f}" >/dev/null 2>&1
+}
+bind -x '"\C-xedit": _edit_command'
+bind '"\C-x\C-e": "\C-xedit\C-xtrap\C-j"'
+
 . /usr/share/bash-completion/bash_completion
 . /usr/share/git/git-prompt.sh
 
