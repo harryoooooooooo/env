@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 function _add_path { [[ :"$PATH": = *:"$1":* ]] || export PATH="$1:$PATH"; }
 _add_path "$HOME"/.local/bin
 _add_path "$HOME"/.cargo/bin
@@ -28,7 +30,7 @@ _last_command_status=
 _last_command_end_time=
 function _pre_command_hook {
   _last_command="${BASH_COMMAND}"
-  _last_command_start_time=`date +%s`
+  _last_command_start_time="$(date +%s)"
   # This happened when user typed empty command.
   if [[ "${_last_command}" == "_post_command_hook" ]]; then
     _last_command=
@@ -36,12 +38,12 @@ function _pre_command_hook {
 }
 function _post_command_hook {
   _last_command_status=$?
-  _last_command_end_time=`date +%s`
+  _last_command_end_time="$(date +%s)"
   _notify_command_done
 }
 function _ps_gen {
   # Date and time
-  printf %s "\[\033[38;5;220m\][\d \t]\[\033[0m\]"
+  printf "%s" "\[\033[38;5;220m\][\d \t]\[\033[0m\]"
   # Return status
   if [[ ${_last_command_status} != 0 ]]; then
     printf "%s" " \[\033[1;38;5;15;48;5;9m\] ${_last_command_status} \[\033[0m\]"
@@ -56,7 +58,7 @@ function _ps_gen {
 }
 PROMPT_COMMAND='
 _post_command_hook
-PS1=`_ps_gen`
+PS1="$(_ps_gen)"
 trap "trap - DEBUG; _pre_command_hook" DEBUG
 (exit ${_last_command_status})
 '
@@ -93,7 +95,7 @@ function _complete_tmux_attach {
   if [[ "${COMP_CWORD}" -ne 1 ]]; then
     return
   fi
-  COMPREPLY=($(compgen -W "$(tmux ls 2>/dev/null | sed 's/:.*//g')" -- "${COMP_WORDS[COMP_CWORD]}"))
+  mapfile -t COMPREPLY < <(compgen -W "$(tmux list-sessions 2>/dev/null | sed 's/:.*//g')" -- "${COMP_WORDS[COMP_CWORD]}")
 }
 complete -o default -F _complete_tmux_attach t
 
@@ -125,7 +127,7 @@ function _complete_kakoune_connect {
   if [[ "${COMP_CWORD}" -ne 1 ]]; then
     return
   fi
-  COMPREPLY=($(compgen -W "$(kak -l | grep -v dead)" -- "${COMP_WORDS[COMP_CWORD]}"))
+  mapfile -t COMPREPLY < <(compgen -W "$(kak -l | grep -v dead)" -- "${COMP_WORDS[COMP_CWORD]}")
 }
 complete -o default -F _complete_kakoune_connect kakc
 
@@ -170,9 +172,9 @@ function _notify_command_done {
   [[ ${_last_command_status} != 0 ]] && title="${title}, status=${_last_command_status}"
 
   local tty
-  if [ -z ${TMUX} ]; then
+  if [ -z "${TMUX}" ]; then
     hterm-notify "${title}" "${full_comm}"
-  elif tty=`tmux display-message -p '#{client_tty}' 2>/dev/null` && [ -n "${tty}" ]; then
+  elif tty="$(tmux display-message -p '#{client_tty}' 2>/dev/null)" && [ -n "${tty}" ]; then
     TERM=xterm hterm-notify "${title}" "${full_comm}" > "${tty}"
   else
     notify-send "${title}" "${full_comm}"
@@ -191,7 +193,7 @@ function set_notify_command_done_mode {
   esac
 }
 function _complete_set_notify_command_done_mode {
-  COMPREPLY=($(compgen -W "auto off" -- "${COMP_WORDS[COMP_CWORD]}"))
+  mapfile -t COMPREPLY < <(compgen -W "auto off" -- "${COMP_WORDS[COMP_CWORD]}")
 }
 complete -F _complete_set_notify_command_done_mode set_notify_command_done_mode
 
@@ -218,20 +220,23 @@ bind '"\C-l": "\C-xclear1\C-xclear2\e>\C-xtrap"'
 
 # Redefined Ctrl + xe edit-and-execute-command that works with pre/post command hook
 function _edit_command {
-  local f=`mktemp --tmpdir edit-command-XXXX.sh`
-  printf '%s\n' "${READLINE_LINE}" > "${f}"
-  "${EDITOR:-vim}" "${f}"
-  READLINE_LINE="$(cat "${f}")"
-  READLINE_POINT="${#READLINE_LINE}"
-  rm "${f}" >/dev/null 2>&1
+  local f
+  f="$(mktemp --tmpdir edit-command-XXXX.sh)" \
+    && printf '%s\n' "${READLINE_LINE}" > "${f}" \
+    && "${EDITOR:-vim}" "${f}" \
+    && READLINE_LINE="$(cat "${f}")" \
+    && READLINE_POINT="${#READLINE_LINE}" \
+    && rm "${f}" >/dev/null 2>&1
 }
 bind -x '"\C-xedit": _edit_command'
 bind '"\C-x\C-e": "\C-xedit\C-xtrap\C-j"'
 
+# shellcheck disable=SC1091
 . /usr/share/bash-completion/bash_completion
+# shellcheck disable=SC1091
 . /usr/share/git/git-prompt.sh
 
-if . /usr/share/fzf/completion.bash; then
+if eval "$(fzf --bash)"; then
   function _fzf_compgen_path {
     ag -g "$1"
   }
