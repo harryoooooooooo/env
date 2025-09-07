@@ -101,9 +101,47 @@ define-command -hidden bs-de-indent %{
 
 ## Plugins.
 
+nop %sh{
+    plug="${kak_config}/plugins/plug.kak"
+    test -d "${plug}" || git clone -q https://github.com/andreyorst/plug.kak.git "${plug}"
+}
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
 
-plug "robertmeta/plug.kak" noload
+plug "occivink/kakoune-find"
+
+plug "andreyorst/fzf.kak" config %{
+    map global user f ':fzf-mode<ret>' -docstring 'enter fzf mode, which contains several key bindings'
+} defer fzf %{
+    set-option global fzf_use_main_selection false
+    set-option global fzf_preview_height '100%'
+    set-option global fzf_window_map 'alt-w'
+    set-option global fzf_vertical_map 'alt-v'
+    set-option global fzf_horizontal_map 'alt-h'
+} defer fzf-file %{
+    try %{ needs-commands fzf-file rg
+    set-option global fzf_file_command 'rg'
+    }
+    set-option global fzf_file_preview false
+} defer fzf-grep %{
+    try %{ needs-commands fzf-grep rg
+    set-option global fzf_grep_command 'rg'
+    }
+    try %{ needs-commands fzf-grep batcat
+    set-option global fzf_grep_preview_command 'batcat --color=always --highlight-line {2} {1}'
+    }
+}
+
+plug "caksoylar/kakoune-focus" config %{
+    map global user s ':focus-toggle<ret>' -docstring "toggle selections focus"
+    set-option global focus_context_lines 2
+}
+
+plug "eburghar/kakpipe" do %{
+    cargo install --force --path . --root ~/.local
+} config %{
+    require-module kakpipe
+}
 
 plug "kak-lsp/kak-lsp" do %{
     cargo install --locked --force --path .
@@ -201,23 +239,6 @@ declare-option -hidden -docstring %{
     The example above should launch a terminal for users to interact with
     the given command "fzf".
 } str term_run_template
-
-try %{ needs-commands find rg fzf
-define-command -docstring '
-find: Invoke fzf to find and open a file' \
-    -params 0 find %{ evaluate-commands %sh{
-    if [ -z "${kak_opt_term_run_template}" ]; then
-        echo "fail term_run_template is not set"
-        exit
-    fi
-    script=`printf "${kak_opt_term_run_template}" "fzf"`
-    filename=`rg -l '' | sh -c "${script}"`
-    if [ -n "${filename}" ]; then
-        printf 'edit "%s"\n' "${filename}"
-    fi
-}}
-map global user f ':find<ret>' -docstring 'find file under cwd with fzf'
-}
 
 try %{ needs-commands sudo-write sudo
 define-command -docstring '
