@@ -22,27 +22,26 @@ set-option global ui_options terminal_enable_mouse=false
 # Show number lines relatively.
 add-highlighter global/nu number-lines -hlcursor -relative
 
-## Ag (the silver searcher) is mush faster then grep.
-try %{
-evaluate-commands %sh{
-    if ! command -v ag >/dev/null 2>&1; then
-        echo 'echo -debug Missing ag command, it is more recommended than grep'
-        echo 'fail Missing ag command'
-    fi
-}
-set-option global grepcmd 'ag --noheading --column --nobreak'
+define-command -hidden -params 2.. needs-commands %{ evaluate-commands %sh{
+    requester="${1}"
+    shift
+    for cmd in "$@"; do
+        if ! command -v "${cmd}" >/dev/null 2>&1; then
+            printf '%s\n' "echo -debug Missing ${cmd} command, ${requester} won't be set"
+            printf '%s\n' "fail Missing ${cmd} command"
+        fi
+    done
+}}
+
+## Rg is much faster then grep.
+try %{ needs-commands grepcmd rg
+set-option global grepcmd 'rg --no-heading --column --no-context-separator'
 }
 map global user g ':grep ' -docstring 'grep text under cwd'
 map global user G %{<a-i>w*:grep '<c-r>/'<ret>} -docstring 'grep the word under cursor under cwd'
 
 ## Add the same <c-a>/<c-x> functions as vim.
-try %{
-evaluate-commands %sh{
-    if ! command -v bc >/dev/null 2>&1; then
-        echo 'echo -debug Missing bc command, <c-a> and <c-x> will not be set'
-        echo 'fail Missing bc command'
-    fi
-}
+try %{ needs-commands '<c-a>/<c-x>' bc
 define-command -hidden -params 2 inc %{
     evaluate-commands %sh{
         if [ "$1" = 0 ]; then
@@ -163,14 +162,7 @@ Note that for each window this command always starts from being as nowrap.' \
 }}
 map global user w ':toggle-wrap<ret>' -docstring 'toggle wrap and unwrap line.'
 
-try %{
-evaluate-commands %sh{
-    if ! command -v osc52 >/dev/null 2>&1; then
-        echo 'echo -debug Missing osc52 script, :clip command will not be defined.'
-        echo 'echo -debug Sample script can be found at: https://chromium.googlesource.com/apps/libapps/+/main/hterm/etc/osc52.sh'
-        echo 'fail Missing osc52 script'
-    fi
-}
+try %{ needs-commands 'clip (see https://chromium.googlesource.com/apps/libapps/+/main/hterm/etc/osc52.sh)' osc52
 define-command -docstring '
 clip: Copy the selected text to clipboard by using OSC 52 escape sequence.
 Additional support/configuring of terminal may be needed.' \
@@ -210,13 +202,7 @@ declare-option -hidden -docstring %{
     the given command "fzf".
 } str term_run_template
 
-try %{
-evaluate-commands %sh{
-    if ! command -v ag >/dev/null 2>&1 || ! command -v fzf >/dev/null 2>&1; then
-        echo 'echo -debug Missing ag or fzf command, :find command will not be defined.'
-        echo 'fail Missing ag or fzf command'
-    fi
-}
+try %{ needs-commands find rg fzf
 define-command -docstring '
 find: Invoke fzf to find and open a file' \
     -params 0 find %{ evaluate-commands %sh{
@@ -225,7 +211,7 @@ find: Invoke fzf to find and open a file' \
         exit
     fi
     script=`printf "${kak_opt_term_run_template}" "fzf"`
-    filename=`ag -g '' | sh -c "${script}"`
+    filename=`rg -l '' | sh -c "${script}"`
     if [ -n "${filename}" ]; then
         printf 'edit "%s"\n' "${filename}"
     fi
@@ -233,13 +219,7 @@ find: Invoke fzf to find and open a file' \
 map global user f ':find<ret>' -docstring 'find file under cwd with fzf'
 }
 
-try %{
-evaluate-commands %sh{
-    if ! command -v sudo >/dev/null 2>&1; then
-        echo 'echo -debug Missing sudo command, :sudo-write command will not be defined.'
-        echo 'fail Missing sudo command'
-    fi
-}
+try %{ needs-commands sudo-write sudo
 define-command -docstring '
 sudo-write [<filename>]: Write as root.' \
     -params 0..1 sudo-write %{
@@ -279,13 +259,7 @@ mouse [on|off]: Enable/disable mouse.' \
 
 hook global ModuleLoaded wayland|x11 %{
 
-try %{
-evaluate-commands %sh{
-    if ! command -v alacritty >/dev/null 2>&1; then
-        echo 'echo -debug Missing alacritty command, term_run_template will not be set'
-        echo 'fail Missing alacritty command'
-    fi
-}
+try %{ needs-commands term_run_template alacritty
 set-option global term_run_template %{
     alacritty -t float-alacritty -e bash -c "%s </proc/$$/fd/0 >/proc/$$/fd/1" </dev/null 2>&1 | true
 }
