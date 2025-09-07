@@ -225,42 +225,6 @@ Additional support/configuring of terminal may be needed.' \
 map global user C ':clip-fn<ret>' -docstring 'copy filename to clipboard.'
 }
 
-declare-option -hidden -docstring %{
-    This option should define a template script for commands to run a
-    program on a terminal-like environment, while the stdin and stdout of
-    the program can still be controlled (with redirection) by the commands.
-
-    Usually it should be set by the windowing modules.
-
-    Sample usage by the commands:
-        script=`printf "${kak_opt_term_run_template}" "fzf"`
-        filename="$(ag -g '' | sh -c "${script}")"
-
-    The example above should launch a terminal for users to interact with
-    the given command "fzf".
-} str term_run_template
-
-try %{ needs-commands sudo-write sudo
-define-command -docstring '
-sudo-write [<filename>]: Write as root.' \
-    -params 0..1 sudo-write %{
-    execute-keys -draft ",%%:sudo-write-impl '%arg{1}'<ret>"
-}
-define-command -hidden -params 1 sudo-write-impl %{ evaluate-commands %sh{
-    if [ -z "${kak_opt_term_run_template}" ]; then
-        echo "fail term_run_template is not set"
-        exit
-    fi
-    filename="${kak_buffile}"
-    if [ -n "$1" ]; then
-        filename="$1"
-    fi
-    script=`printf "${kak_opt_term_run_template}" "sudo tee ${filename}"`
-    printf '%s' "${kak_selection}" | sh -c "${script}" >/dev/null
-}}
-alias global sw sudo-write
-}
-
 define-command -docstring '
 mouse [on|off]: Enable/disable mouse.' \
     -shell-script-candidates %{ printf 'on\noff\n' } \
@@ -278,25 +242,7 @@ mouse [on|off]: Enable/disable mouse.' \
     esac
 }}
 
-hook global ModuleLoaded wayland|x11 %{
-
-try %{ needs-commands term_run_template alacritty
-set-option global term_run_template %{
-    alacritty -t float-alacritty -e bash -c "%s </proc/$$/fd/0 >/proc/$$/fd/1" </dev/null 2>&1 | true
-}
-}
-
-} # End of ModuleLoaded wayland|x11
-
 hook global ModuleLoaded tmux %{
-
-set-option global term_run_template %{
-    sig=`mktemp --tmpdir kak-tmux-run-XXXXXX-done`
-    TMUX="${kak_client_env_TMUX}" tmux \
-        display-popup -E "%s </proc/$$/fd/0 >/proc/$$/fd/1; tmux wait-for -S ${sig}" \; \
-        wait-for ${sig} </dev/null >/dev/null 2>&1
-    rm ${sig}
-}
 
 define-command -docstring '
 new [<commands>]: Create a new kakoune client horizontally.
