@@ -133,6 +133,7 @@ complete -o default -F _complete_kakoune_connect kakc
 
 NOTIFY_COMMAND_DONE_THRESHOLD=20
 NOTIFY_COMMAND_DONE_BLOCK_LIST=(
+  fg
   t ssh
   man git hg
   kak kakc vim vimdiff
