@@ -9,6 +9,8 @@
 	d = diff
 	fu = commit --fixup
 	cp = cherry-pick
+	amend = commit -a --amend --no-edit
+	reword = commit --amend
 [color]
 	ui = true
 [pull]
