@@ -141,6 +141,9 @@ plug "eburghar/kakpipe" do %{
     cargo install --force --path . --root ~/.local
 } config %{
     require-module kakpipe
+    define-command -params 1.. -docstring 'launch cargo with the given parameters inside kakoune' cargo %{
+        kakpipe -S -- cargo --color=always %arg{@}
+    }
 }
 
 plug "kak-lsp/kak-lsp" do %{
