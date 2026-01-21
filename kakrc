@@ -146,7 +146,7 @@ plug "eburghar/kakpipe" do %{
     }
 }
 
-plug "kak-lsp/kak-lsp" do %{
+plug "kakoune-lsp/kakoune-lsp" do %{
     cargo install --locked --force --path .
 } config %{
     ## Enable Language Server Protocol.
@@ -157,8 +157,17 @@ plug "kak-lsp/kak-lsp" do %{
     hook global WinSetOption filetype=(go|python|rust) %{
         lsp-enable-window
         map window user l ':enter-user-mode lsp<ret>' -docstring 'Enter lsp mode'
+        map global goto d <esc>:lsp-definition<ret> -docstring 'LSP definition'
+        map global goto r <esc>:lsp-references<ret> -docstring 'LSP references'
+        map global goto y <esc>:lsp-type-definition<ret> -docstring 'LSP type definition'
         map window insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' \
             -docstring 'Select next snippet placeholder. <c-o> to close the complete window before using this.'
+        map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+        map global object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+        map global object f '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
+        map global object t '<a-semicolon>lsp-object Class Interface Module Namespace Struct<ret>' -docstring 'LSP class or module'
+        map global object d '<a-semicolon>lsp-diagnostic-object error warning<ret>' -docstring 'LSP errors and warnings'
+        map global object D '<a-semicolon>lsp-diagnostic-object error<ret>' -docstring 'LSP errors'
     }
 }
 
