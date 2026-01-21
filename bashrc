@@ -78,10 +78,24 @@ alias la='ls -A'
 alias ll='ls -lh'
 alias lla='ll -a'
 alias ls='ls --color=auto -F'
-alias ..='cd ..'
-alias ..2='cd ../..'
-alias ..3='cd ../../..'
-alias ..4='cd ../../../..'
+
+function .. {
+  local count="$1"
+  case "${count}" in
+    "")
+      count=1
+      ;;
+    *[!0-9]*)
+      echo "Invalid count" 1>&2
+      return 87
+      ;;
+  esac
+  local final_path=.
+  while ((count-- > 0)) && [[ "$(realpath "${final_path}")" != / ]]; do
+    final_path+="/.."
+  done
+  cd "${final_path}"
+}
 
 function history.sync { history -a; history -c; history -r; }
 alias clip='osc52'
