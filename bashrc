@@ -56,12 +56,12 @@ function _ps_gen {
   # User name and host name
   printf %s "\[\033[1;38;5;10m\]\u@\h\[\033[0m\]\$ "
 }
-PROMPT_COMMAND='
+PROMPT_COMMAND=('
 _post_command_hook
 PS1="$(_ps_gen)"
 trap "trap - DEBUG; _pre_command_hook" DEBUG
 (exit ${_last_command_status})
-'
+')
 
 if [[ "${TERM}" = *256color* ]]; then
   export COLORTERM=truecolor
