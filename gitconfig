@@ -8,6 +8,7 @@
 	pd = diff HEAD~
 	d = diff
 	fu = commit --fixup
+	fu-c = -c core.editor=true rebase -i
 	cp = cherry-pick
 	amend = commit -a --amend --no-edit
 	reword = commit --amend
