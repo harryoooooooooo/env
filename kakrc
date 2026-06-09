@@ -195,6 +195,51 @@ pwd: Show the current working directory.' \
     echo %sh{pwd}
 }
 
+declare-option -hidden str-list folded_ranges
+declare-option -hidden range-specs folded_spec
+add-highlighter global/ replace-ranges folded_spec
+define-command -docstring '
+fold-reset: ' \
+    -params 0 fold-reset %{ evaluate-commands %{
+    unset-option window folded_ranges
+    unset-option window folded_spec
+}}
+define-command -docstring '
+fold-extend: ' \
+    -params 0 fold-extend %{ evaluate-commands -save-regs '^' %sh{
+    if [ -n "${kak_opt_folded_ranges}" ]; then
+        printf '%s\n' "execute-keys -save-regs '' Z"
+        printf '%s\n' "select ${kak_opt_folded_ranges}"
+        printf '%s\n' "execute-keys -save-regs '' '<a-z>a<a-:>'"
+    fi
+    printf '%s\n' "fold"
+    if [ -n "${kak_opt_folded_ranges}" ]; then
+        printf '%s\n' "execute-keys -save-regs '' z"
+    fi
+    }}
+define-command -docstring '
+fold: ' \
+    -params 0 fold %{ evaluate-commands %sh{
+    set -- ${kak_selections_desc}
+    spec='%val{timestamp}'
+    for x in "$@"; do
+        IFS=,. selection_desc=(${x})
+        lines=$((selection_desc[2] - selection_desc[0]))
+        lines="${lines#-}"  # Remove minus sign
+        lines=$((lines + 1))
+        if [ "${lines}" = 1 ]; then
+            spec="${spec} '${x}|{rgb:697098+iubF}\\{-- folded --}'"
+        else
+            spec="${spec} '${x}|{rgb:697098+iubF}\\{-- folded ${lines} lines --}'"
+        fi
+    done
+    printf '%s\n' "set-option window folded_spec ${spec}"
+    printf '%s\n' "set-option window folded_ranges ${kak_selections_desc}"
+}}
+map global user z ':fold<ret>'  -docstring 'Set current selections to folds'
+map global user Z ':fold-extend<ret>'  -docstring 'Add current selections to folds'
+map global user <a-z> ':fold-reset<ret>' -docstring 'Remove all folds'
+
 declare-option -hidden bool toggle_wrap_state false
 define-command -docstring '
 toggle-wrap: Toggle between wrap and nowrap on current window.
