@@ -149,7 +149,7 @@ NOTIFY_COMMAND_DONE_THRESHOLD=20
 NOTIFY_COMMAND_DONE_BLOCK_LIST=(
   fg
   t ssh
-  man git hg
+  man git hg jj
   kak kakc vim vimdiff
 )
 NOTIFY_COMMAND_DONE_MODE=auto
