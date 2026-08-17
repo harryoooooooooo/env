@@ -19,6 +19,7 @@ HISTFILESIZE=64000
 shopt -s histappend
 # Check the window size and update the values of LINES and COLUMNS
 shopt -s checkwinsize
+export LINES COLUMNS
 # Enable `**`
 shopt -s globstar
 # Enable more pattern matching syntax e.g. `+(pattern-list)`

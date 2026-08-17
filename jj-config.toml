@@ -1,0 +1,45 @@
+#:schema https://docs.jj-vcs.dev/latest/config-schema.json
+
+[ui]
+# Default showing oneline-style
+default-command = ["log", "-T", "builtin_log_compact"]
+# Use git diff format so we can leverage git delta pager
+diff-formatter = ":git"
+pager = ["sh", "-c", '''
+delta \
+  --no-gitconfig \
+  --navigate \
+  --tabs 8 \
+  --plus-emph-style      "syntax #004500" \
+  --plus-style           "syntax #004500" \
+  --plus-non-emph-style  "syntax #002500" \
+  --minus-emph-style     "syntax #700000" \
+  --minus-style          "syntax #700000" \
+  --minus-non-emph-style "syntax #400000" \
+  `((COLUMNS>=180))&&printf -- --side-by-side`
+''']
+# Use vimdiff for splitting and conflict resolving
+diff-editor = "vim"
+merge-editor = "vim"
+
+[merge-tools.vim]
+# vimdiff args for splitting and conflict resolving
+edit-args = ["-c", "DirDiff $left $right"]
+merge-args = ["-f", "-d", "$output",
+  "-M", "$left", "$base", "$right",
+  "-c", "wincmd J", "-c", "set modifiable",
+  "-c", "set write",
+]
+merge-tool-edits-conflict-markers = true
+
+[revsets]
+# By default advance bookmark to the latest non-empty commit with description
+bookmark-advance-to = 'heads(::@ & ~description(exact:"") & (~empty() | merges()))'
+
+[aliases]
+d = ["diff"]
+pd = ["diff",  "--from",  "@--"]
+
+[templates]
+# `jj log` shows full description
+log = "builtin_log_compact_full_description"
