@@ -47,10 +47,9 @@ hi CursorLine ctermbg=NONE
 hi CursorLineNr cterm=NONE ctermfg=black ctermbg=darkgray
 hi OverLength ctermbg=darkgray
 
-autocmd FileType gitcommit match OverLength /\%73v.\+/
-autocmd FileType sql       match OverLength /\%101v.\+/
 autocmd FileType python    match OverLength /\%81v.\+/
-autocmd FileType cpp       match OverLength /\%81v.\+/
+autocmd FileType cpp       match OverLength /\%101v.\+/
+autocmd FileType rust      match OverLength /\%101v.\+/
 
 function! Sudowrite()
   exe 'w ! sudo tee' shellescape('%') '> /dev/null'
