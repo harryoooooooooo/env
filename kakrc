@@ -16,6 +16,17 @@ add-highlighter global/ws show-whitespaces -spc ' ' -nbsp ' ' -tab ▏
 # Make tailing Whitespaces more visible.
 add-highlighter global/t-ws regex '\h+$' 0:black,rgb:666666+F
 
+# Highlight the texts exceeding the line length limit
+hook global WinSetOption filetype=(jjdescription|git-commit) %{
+    add-highlighter window/ regex '^[^\n]{72}([^\n]+)$' 1:default,rgb:666666+F
+}
+hook global WinSetOption filetype=(rust|cpp) %{
+    add-highlighter window/ regex '^[^\n]{100}([^\n]+)$' 1:default,rgb:666666+F
+}
+hook global WinSetOption filetype=(python) %{
+    add-highlighter window/ regex '^[^\n]{80}([^\n]+)$' 1:default,rgb:666666+F
+}
+
 ## Disable mouse.
 set-option global ui_options terminal_enable_mouse=false
 
@@ -67,6 +78,11 @@ map global view <left>  h -docstring 'scroll left'
 map global view <down>  j -docstring 'scroll down'
 map global view <up>    k -docstring 'scroll up'
 map global view <right> l -docstring 'scroll right'
+
+## Define the file types that's not officially supported
+hook global BufCreate .*\.jjdescription %{
+    set-option buffer filetype jjdescription
+}
 
 ## Indent settings. Default 2 spaces.
 set-option global indentwidth 2
