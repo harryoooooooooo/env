@@ -57,6 +57,7 @@ function _ps_gen {
   # User name and host name
   printf %s "\[\033[1;38;5;10m\]\u@\h\[\033[0m\]\$ "
 }
+# shellcheck disable=SC2016
 PROMPT_COMMAND=('
 _post_command_hook
 PS1="$(_ps_gen)"
@@ -95,7 +96,7 @@ function .. {
   while ((count-- > 0)) && [[ "$(realpath "${final_path}")" != / ]]; do
     final_path+="/.."
   done
-  cd "${final_path}"
+  cd "${final_path}" || return
 }
 
 function history.sync { history -a; history -c; history -r; }
