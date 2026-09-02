@@ -13,18 +13,22 @@ add-highlighter global/matching show-matching
 set-face global Whitespace rgb:4b5263,default+fg
 add-highlighter global/ws show-whitespaces -spc ' ' -nbsp ' ' -tab ▏
 
-# Make tailing Whitespaces more visible.
-add-highlighter global/t-ws regex '\h+$' 0:black,rgb:666666+F
-
-# Highlight the texts exceeding the line length limit
-hook global WinSetOption filetype=(jjdescription|git-commit) %{
-    add-highlighter window/ regex '^[^\n]{72}([^\n]+)$' 1:default,rgb:666666+F
+## Highlight something that's ill formed.
+set-face global IllFormed black,rgb:666666+fg
+# Tailing whitespaces.
+add-highlighter global/tailing-ws regex '\h+$' 0:IllFormed
+# Line length limit exceeded.
+evaluate-commands %sh{
+    set -- "(jjdescription|git-commit)" 72 "python" 80 "(rust|cpp)" 100
+    while [ $# -ge 2 ]; do
+        cat <<EOF
+hook -group line-length-limit-highlight global WinSetOption filetype=$1 %{
+    add-highlighter window/line-length-limit regex '^\\N{$2}(\\N+)\$' 1:IllFormed
+    hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/line-length-limit }
 }
-hook global WinSetOption filetype=(rust|cpp) %{
-    add-highlighter window/ regex '^[^\n]{100}([^\n]+)$' 1:default,rgb:666666+F
-}
-hook global WinSetOption filetype=(python) %{
-    add-highlighter window/ regex '^[^\n]{80}([^\n]+)$' 1:default,rgb:666666+F
+EOF
+        shift 2
+    done
 }
 
 ## Disable mouse.
