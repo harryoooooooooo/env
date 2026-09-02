@@ -84,6 +84,20 @@ hook global BufCreate .*\.jjdescription %{
     set-option buffer filetype jjdescription
 }
 
+## Highlighting for file types
+hook global WinSetOption filetype=jjdescription %{
+    require-module jjdescription
+    add-highlighter window/jjdescription ref jjdescription
+    hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/jjdescription }
+}
+provide-module jjdescription %{
+add-highlighter shared/jjdescription regions
+add-highlighter shared/jjdescription/comments region ^JJ: $ group
+add-highlighter shared/jjdescription/comments/ fill comment
+add-highlighter shared/jjdescription/comments/ regex "\b(?:(M)|(D)|(A)|(R)) (\N*)$" 1:yellow 2:red 3:green 4:blue 5:magenta
+add-highlighter shared/jjdescription/comments/ regex "\bChange ID:(\N*)$" 1:bright-magenta
+}
+
 ## Indent settings. Default 2 spaces.
 set-option global indentwidth 2
 # Languages that prefer tabs.
