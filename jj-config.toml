@@ -2,7 +2,7 @@
 
 [ui]
 # Default showing oneline-style
-default-command = ["log", "-T", "builtin_log_compact"]
+default-command = ["lg"]
 # Use git diff format so we can leverage git delta pager
 diff-formatter = ":git"
 pager = ["sh", "-c", '''
@@ -39,6 +39,7 @@ bookmark-advance-to = 'heads(::@ & ~description(exact:"") & (~empty() | merges()
 [aliases]
 d = ["diff"]
 pd = ["diff",  "--from",  "@--"]
+lg = ["log", "-T", "builtin_log_compact"]
 
 [templates]
 # `jj log` shows full description
