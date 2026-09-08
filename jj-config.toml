@@ -40,6 +40,7 @@ bookmark-advance-to = 'heads(::@ & ~description(exact:"") & (~empty() | merges()
 d = ["diff"]
 pd = ["diff",  "--from",  "@--"]
 lg = ["log", "-T", "builtin_log_compact"]
+dup = ["duplicate"]
 
 [templates]
 # `jj log` shows full description
