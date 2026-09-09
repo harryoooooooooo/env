@@ -41,6 +41,7 @@ d = ["diff"]
 pd = ["diff",  "--from",  "@--"]
 lg = ["log", "-T", "builtin_log_compact"]
 dup = ["duplicate"]
+sq = ["squash"]
 
 [templates]
 # `jj log` shows full description
