@@ -4,7 +4,6 @@ function _add_path { [[ :"$PATH": = *:"$1":* ]] || export PATH="$1:$PATH"; }
 _add_path "$HOME"/.local/bin
 _add_path "$HOME"/.cargo/bin
 _add_path "$HOME"/go/bin
-unset -f _add_path
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
