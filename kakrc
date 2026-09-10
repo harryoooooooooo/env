@@ -14,7 +14,7 @@ set-face global Whitespace rgb:4b5263,default+fg
 add-highlighter global/ws show-whitespaces -spc ' ' -nbsp ' ' -tab ▏
 
 ## Highlight something that's ill formed.
-set-face global IllFormed black,rgb:666666+fg
+set-face global IllFormed ,rgb:444444+g
 # Tailing whitespaces.
 add-highlighter global/tailing-ws regex '\h+$' 0:IllFormed
 # Line length limit exceeded.
