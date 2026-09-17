@@ -251,8 +251,10 @@ bind '"\C-x\C-e": "\C-xedit\C-xtrap\C-j"'
 . /usr/share/bash-completion/bash_completion
 # shellcheck disable=SC1091
 . /usr/share/git/git-prompt.sh
-
-if eval "$(fzf --bash)"; then
+# shellcheck source=/dev/null
+. <(COMPLETE=bash jj)
+# shellcheck source=/dev/null
+if . <(fzf --bash); then
   function _fzf_compgen_path {
     ag -g "$1"
   }
