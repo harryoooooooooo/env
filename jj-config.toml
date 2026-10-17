@@ -43,6 +43,7 @@ lg = ["log", "-T", "builtin_log_compact"]
 dup = ["duplicate"]
 sq = ["squash"]
 e = ["edit"]
+aba = ["abandon"]
 
 [templates]
 # `jj log` shows full description
